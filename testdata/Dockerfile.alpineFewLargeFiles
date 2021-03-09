@@ -1,0 +1,5 @@
+FROM alpine:latest
+COPY largeFile /largeFile1
+COPY largeFile /largeFile2
+COPY testdata/exampleApp /
+RUN /exampleApp
