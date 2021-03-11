@@ -1,5 +1,5 @@
 FROM alpine:latest
 COPY smallFile /smallFile1
 COPY smallFile /smallFile2
-COPY testdata/exampleApp /
+COPY out/exampleApp /
 RUN /exampleApp
