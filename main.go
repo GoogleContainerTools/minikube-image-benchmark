@@ -27,7 +27,7 @@ type aggregatedRunResult struct {
 type aggregatedResultsMatrix map[string]map[string]aggregatedRunResult
 
 type method struct {
-	f    func(image string) (*runResult, error)
+	f    func(image string, profile string) (*runResult, error)
 	name string
 }
 
@@ -36,6 +36,7 @@ var methods = []string{"image load", "docker-env"}
 
 func main() {
 	runs := flag.Int("runs", 100, "number of runs per benchmark")
+	profile := flag.String("profile", "benchmark", "profile to use for minikube commands")
 	flag.Parse()
 
 	if *runs <= 0 {
@@ -46,17 +47,50 @@ func main() {
 		log.Fatal(err)
 	}
 
-	results, err := runBenchmarks(*runs)
+	if err := startMinikube(*profile); err != nil {
+		log.Fatal(err)
+	}
+	defer deleteMinikube(*profile)
+
+	results, err := runBenchmarks(*runs, *profile)
 	if err != nil {
-		log.Fatalf("failed running benchmarks: %v", err)
+		log.Printf("failed running benchmarks: %v", err)
+		return
 	}
 	ag := aggregateResults(results)
 	if err := writeToCSV(ag); err != nil {
-		log.Fatalf("failed to write to csv: %v", err)
+		log.Printf("failed to write to csv: %v", err)
+		return
 	}
 }
 
-func runBenchmarks(runs int) (runResultsMatrix, error) {
+func startMinikube(profile string) error {
+	fmt.Printf("Starting minikube...\n")
+	start := exec.Command("./minikube", "start", "-p", "profile", "--driver", "docker")
+	if _, err := runCmd(start); err != nil {
+		return fmt.Errorf("failed to start minikube: %v", err)
+	}
+	return nil
+}
+
+func deleteMinikube(profile string) error {
+	fmt.Printf("Deleting minikube...\n")
+	delete := exec.Command("./minikube", "delete", "-p", profile)
+	if _, err := runCmd(delete); err != nil {
+		return fmt.Errorf("failed to delete minikube: %v", err)
+	}
+	return nil
+}
+
+func runCmd(cmd *exec.Cmd) (string, error) {
+	o, err := cmd.CombinedOutput()
+	if err != nil {
+		return "", fmt.Errorf("\ncommand: %s\ncommand output: %s\nerr: %v", cmd.String(), string(o), err)
+	}
+	return string(o), nil
+}
+
+func runBenchmarks(runs int, profile string) (runResultsMatrix, error) {
 	methods := []method{
 		{
 			imageLoad,
@@ -72,7 +106,7 @@ func runBenchmarks(runs int) (runResultsMatrix, error) {
 		for _, method := range methods {
 			fmt.Printf("\nRunning %s on %s\n", image, method.name)
 			for i := 0; i < runs; i++ {
-				rr, err := method.f(image)
+				rr, err := method.f(image, profile)
 				if err != nil {
 					return nil, fmt.Errorf("failed running benchmark %s on %s: %v", image, method.name, err)
 				}
@@ -152,9 +186,9 @@ func aggregateResults(r runResultsMatrix) aggregatedResultsMatrix {
 	return ag
 }
 
-func dockerEnv(image string) (*runResult, error) {
+func dockerEnv(image string, profile string) (*runResult, error) {
 	// build
-	buildArgs := fmt.Sprintf("eval $(minikube docker-env) && docker build --no-cache -t benchmark-env -f testdata/Dockerfile.%s .", image)
+	buildArgs := fmt.Sprintf("eval $(./minikube -p %s docker-env) && docker build --no-cache -t benchmark-env -f testdata/Dockerfile.%s .", profile, image)
 	build := exec.Command("/bin/bash", "-c", buildArgs)
 	start := time.Now()
 	if err := build.Run(); err != nil {
@@ -163,14 +197,14 @@ func dockerEnv(image string) (*runResult, error) {
 	elapsed := time.Now().Sub(start)
 
 	// delete image to prevent caching
-	deleteArgs := "eval $(minikube docker-env) && docker image rm benchmark-env:latest"
+	deleteArgs := fmt.Sprintf("eval $(./minikube -p %s docker-env) && docker image rm benchmark-env:latest", profile)
 	deleteImage := exec.Command("/bin/bash", "-c", deleteArgs)
 	if err := deleteImage.Run(); err != nil {
 		return nil, fmt.Errorf("failed to delete image: %v", err)
 	}
 
 	// clear builder cache, must be run after the image delete
-	clearBuilderCacheArgs := "eval $(minikube docker-env) && docker builder prune -f"
+	clearBuilderCacheArgs := fmt.Sprintf("eval $(./minikube -p %s docker-env) && docker builder prune -f", profile)
 	clearBuilderCache := exec.Command("/bin/bash", "-c", clearBuilderCacheArgs)
 	if err := clearBuilderCache.Run(); err != nil {
 		return nil, fmt.Errorf("failed to clear builder cache: %v", err)
@@ -178,7 +212,7 @@ func dockerEnv(image string) (*runResult, error) {
 	return &runResult{runTime: elapsed.Seconds()}, nil
 }
 
-func imageLoad(image string) (*runResult, error) {
+func imageLoad(image string, profile string) (*runResult, error) {
 	// build
 	dockerfile := fmt.Sprintf("testdata/Dockerfile.%s", image)
 	build := exec.Command("docker", "build", "--no-cache", "-t", "benchmark-image", "-f", dockerfile, ".")
@@ -188,14 +222,14 @@ func imageLoad(image string) (*runResult, error) {
 	}
 
 	// image load
-	imageLoad := exec.Command("minikube", "image", "load", "benchmark-image:latest")
+	imageLoad := exec.Command("./minikube", "-p", profile, "image", "load", "benchmark-image:latest")
 	if err := imageLoad.Run(); err != nil {
 		return nil, fmt.Errorf("failed to image load: %v", err)
 	}
 	elapsed := time.Now().Sub(start)
 
 	// verify image exists
-	verifyImageArgs := "eval $(minikube docker-env) && docker image ls | grep benchmark-image"
+	verifyImageArgs := fmt.Sprintf("eval $(./minikube -p %s docker-env) && docker image ls | grep benchmark-image", profile)
 	verifyImage := exec.Command("/bin/bash", "-c", verifyImageArgs)
 	o, err := verifyImage.Output()
 	if err != nil {
@@ -206,7 +240,7 @@ func imageLoad(image string) (*runResult, error) {
 	}
 
 	// delete image from minikube to prevent caching
-	deleteMinikubeImageArgs := "eval $(minikube docker-env) && docker image rm benchmark-image:latest"
+	deleteMinikubeImageArgs := fmt.Sprintf("eval $(./minikube -p %s docker-env) && docker image rm benchmark-image:latest", profile)
 	deleteMinikubeImage := exec.Command("/bin/bash", "-c", deleteMinikubeImageArgs)
 	if err := deleteMinikubeImage.Run(); err != nil {
 		return nil, fmt.Errorf("failed to delete minikube image: %v", err)
