@@ -194,10 +194,17 @@ func imageLoad(image string) (*runResult, error) {
 	}
 	elapsed := time.Now().Sub(start)
 
-	// delete image to prevent caching
-	deleteImage := exec.Command("docker", "image", "rm", "benchmark-image:latest")
-	if err := deleteImage.Run(); err != nil {
-		return nil, fmt.Errorf("failed to delete image: %v", err)
+	// delete image from minikube to prevent caching
+	deleteMinikubeImageArgs := "eval $(minikube docker-env) && docker image rm benchmark-image:latest"
+	deleteMinikubeImage := exec.Command("/bin/bash", "-c", deleteMinikubeImageArgs)
+	if err := deleteMinikubeImage.Run(); err != nil {
+		return nil, fmt.Errorf("failed to delete minikube image: %v", err)
+	}
+
+	// delete image from Docker to prevent caching
+	deleteDockerImage := exec.Command("docker", "image", "rm", "benchmark-image:latest")
+	if err := deleteDockerImage.Run(); err != nil {
+		return nil, fmt.Errorf("failed to delete docker image: %v", err)
 	}
 
 	// clear builder cache, must be run after the image delete
