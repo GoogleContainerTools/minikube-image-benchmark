@@ -191,7 +191,7 @@ func dockerEnv(image string, profile string) (*runResult, error) {
 	buildArgs := fmt.Sprintf("eval $(./minikube -p %s docker-env) && docker build --no-cache -t benchmark-env -f testdata/Dockerfile.%s .", profile, image)
 	build := exec.Command("/bin/bash", "-c", buildArgs)
 	start := time.Now()
-	if err := build.Run(); err != nil {
+	if _, err := runCmd(build); err != nil {
 		return nil, fmt.Errorf("failed to build via docker-env: %v", err)
 	}
 	elapsed := time.Now().Sub(start)
@@ -199,14 +199,14 @@ func dockerEnv(image string, profile string) (*runResult, error) {
 	// delete image to prevent caching
 	deleteArgs := fmt.Sprintf("eval $(./minikube -p %s docker-env) && docker image rm benchmark-env:latest", profile)
 	deleteImage := exec.Command("/bin/bash", "-c", deleteArgs)
-	if err := deleteImage.Run(); err != nil {
+	if _, err := runCmd(deleteImage); err != nil {
 		return nil, fmt.Errorf("failed to delete image: %v", err)
 	}
 
 	// clear builder cache, must be run after the image delete
 	clearBuilderCacheArgs := fmt.Sprintf("eval $(./minikube -p %s docker-env) && docker builder prune -f", profile)
 	clearBuilderCache := exec.Command("/bin/bash", "-c", clearBuilderCacheArgs)
-	if err := clearBuilderCache.Run(); err != nil {
+	if _, err := runCmd(clearBuilderCache); err != nil {
 		return nil, fmt.Errorf("failed to clear builder cache: %v", err)
 	}
 	return &runResult{runTime: elapsed.Seconds()}, nil
@@ -217,13 +217,13 @@ func imageLoad(image string, profile string) (*runResult, error) {
 	dockerfile := fmt.Sprintf("testdata/Dockerfile.%s", image)
 	build := exec.Command("docker", "build", "--no-cache", "-t", "benchmark-image", "-f", dockerfile, ".")
 	start := time.Now()
-	if err := build.Run(); err != nil {
+	if _, err := runCmd(build); err != nil {
 		return nil, fmt.Errorf("failed to build via image load: %v", err)
 	}
 
 	// image load
 	imageLoad := exec.Command("./minikube", "-p", profile, "image", "load", "benchmark-image:latest")
-	if err := imageLoad.Run(); err != nil {
+	if _, err := runCmd(imageLoad); err != nil {
 		return nil, fmt.Errorf("failed to image load: %v", err)
 	}
 	elapsed := time.Now().Sub(start)
@@ -231,7 +231,7 @@ func imageLoad(image string, profile string) (*runResult, error) {
 	// verify image exists
 	verifyImageArgs := fmt.Sprintf("eval $(./minikube -p %s docker-env) && docker image ls | grep benchmark-image", profile)
 	verifyImage := exec.Command("/bin/bash", "-c", verifyImageArgs)
-	o, err := verifyImage.Output()
+	o, err := runCmd(verifyImage)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get image list: %v", err)
 	}
@@ -242,19 +242,19 @@ func imageLoad(image string, profile string) (*runResult, error) {
 	// delete image from minikube to prevent caching
 	deleteMinikubeImageArgs := fmt.Sprintf("eval $(./minikube -p %s docker-env) && docker image rm benchmark-image:latest", profile)
 	deleteMinikubeImage := exec.Command("/bin/bash", "-c", deleteMinikubeImageArgs)
-	if err := deleteMinikubeImage.Run(); err != nil {
+	if _, err := runCmd(deleteMinikubeImage); err != nil {
 		return nil, fmt.Errorf("failed to delete minikube image: %v", err)
 	}
 
 	// delete image from Docker to prevent caching
 	deleteDockerImage := exec.Command("docker", "image", "rm", "benchmark-image:latest")
-	if err := deleteDockerImage.Run(); err != nil {
+	if _, err := runCmd(deleteDockerImage); err != nil {
 		return nil, fmt.Errorf("failed to delete docker image: %v", err)
 	}
 
 	// clear builder cache, must be run after the image delete
 	clearBuildCache := exec.Command("docker", "builder", "prune", "-f")
-	if err := clearBuildCache.Run(); err != nil {
+	if _, err := runCmd(clearBuildCache); err != nil {
 		return nil, fmt.Errorf("failed to clear builder cache: %v", err)
 	}
 	return &runResult{runTime: elapsed.Seconds()}, nil
