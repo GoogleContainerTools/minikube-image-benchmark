@@ -194,6 +194,17 @@ func imageLoad(image string) (*runResult, error) {
 	}
 	elapsed := time.Now().Sub(start)
 
+	// verify image exists
+	verifyImageArgs := "eval $(minikube docker-env) && docker image ls | grep benchmark-image"
+	verifyImage := exec.Command("/bin/bash", "-c", verifyImageArgs)
+	o, err := verifyImage.Output()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get image list: %v", err)
+	}
+	if string(o) == "" {
+		return nil, fmt.Errorf("image was not found after image load")
+	}
+
 	// delete image from minikube to prevent caching
 	deleteMinikubeImageArgs := "eval $(minikube docker-env) && docker image rm benchmark-image:latest"
 	deleteMinikubeImage := exec.Command("/bin/bash", "-c", deleteMinikubeImageArgs)
