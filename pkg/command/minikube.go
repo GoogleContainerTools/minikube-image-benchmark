@@ -11,6 +11,12 @@ func StartMinikube(profile string) error {
 	if _, err := run(start); err != nil {
 		return fmt.Errorf("failed to start minikube: %v", err)
 	}
+
+	enableRegistry := exec.Command("./minikube", "-p", profile, "addons", "enable", "registry")
+	if _, err := run(enableRegistry); err != nil {
+		DeleteMinikube(profile)
+		return fmt.Errorf("failed to enable registry addon: %v", err)
+	}
 	return nil
 }
 
