@@ -22,7 +22,7 @@ type method struct {
 }
 
 var Images = []string{"alpineFewLargeFiles", "alpineFewSmallFiles", "ubuntuFewLargeFiles", "ubuntuFewSmallFiles"}
-var Methods = []string{"image load", "docker-env"}
+var Methods = []string{"image load", "docker-env", "registry"}
 
 func Run(runs int, profile string) (AggregatedResultsMatrix, error) {
 	methods := []method{
@@ -33,6 +33,10 @@ func Run(runs int, profile string) (AggregatedResultsMatrix, error) {
 		{
 			command.RunDockerEnv,
 			"docker-env",
+		},
+		{
+			command.RunRegistry,
+			"registry",
 		}}
 	results := runResultsMatrix{}
 	for _, image := range Images {
