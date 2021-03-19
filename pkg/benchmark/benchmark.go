@@ -17,8 +17,9 @@ type aggregatedRunResult struct {
 type AggregatedResultsMatrix map[string]map[string]aggregatedRunResult
 
 type method struct {
-	f    func(image string, profile string) (float64, error)
-	name string
+	bench      func(image string, profile string) (float64, error)
+	cacheClear func(profile string) error
+	name       string
 }
 
 var Images = []string{"alpineFewLargeFiles", "alpineFewSmallFiles", "ubuntuFewLargeFiles", "ubuntuFewSmallFiles"}
@@ -28,14 +29,17 @@ func Run(runs int, profile string) (AggregatedResultsMatrix, error) {
 	methods := []method{
 		{
 			command.RunImageLoad,
+			command.ClearImageLoadCache,
 			"image load",
 		},
 		{
 			command.RunDockerEnv,
+			command.ClearDockerEnvCache,
 			"docker-env",
 		},
 		{
 			command.RunRegistry,
+			command.ClearRegistryCache,
 			"registry",
 		}}
 	results := runResultsMatrix{}
@@ -44,12 +48,15 @@ func Run(runs int, profile string) (AggregatedResultsMatrix, error) {
 		for _, method := range methods {
 			fmt.Printf("\nRunning %s on %s\n", image, method.name)
 			for i := 0; i < runs; i++ {
-				runTime, err := method.f(image, profile)
+				runTime, err := method.bench(image, profile)
 				if err != nil {
 					return nil, fmt.Errorf("failed running benchmark %s on %s: %v", image, method.name, err)
 				}
 				imageResults[method.name] = append(imageResults[method.name], runTime)
 				displayRun(i+1, runTime)
+			}
+			if err := method.cacheClear(profile); err != nil {
+				return nil, fmt.Errorf("failed to clear cache: %v", err)
 			}
 		}
 		results[image] = imageResults

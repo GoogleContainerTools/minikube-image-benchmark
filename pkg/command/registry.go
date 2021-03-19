@@ -46,3 +46,7 @@ func RunRegistry(image string, profile string) (float64, error) {
 
 	return elapsed.Seconds(), nil
 }
+
+func ClearRegistryCache(profile string) error {
+	return nil
+}
