@@ -8,7 +8,7 @@ import (
 
 func RunDockerEnv(image string, profile string) (float64, error) {
 	// build
-	buildArgs := fmt.Sprintf("eval $(./minikube -p %s docker-env) && docker build --no-cache -t benchmark-env -f testdata/Dockerfile.%s .", profile, image)
+	buildArgs := fmt.Sprintf("eval $(./minikube -p %s docker-env) && docker build -t benchmark-env -f testdata/Dockerfile.%s .", profile, image)
 	build := exec.Command("/bin/bash", "-c", buildArgs)
 	start := time.Now()
 	if _, err := run(build); err != nil {

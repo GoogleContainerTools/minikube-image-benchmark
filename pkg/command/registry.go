@@ -10,7 +10,7 @@ func RunRegistry(image string, profile string) (float64, error) {
 	// build
 	dockerfile := fmt.Sprintf("testdata/Dockerfile.%s", image)
 	tag := fmt.Sprintf("$(./minikube -p %s ip):5000/benchmark-registry", profile)
-	buildArgs := fmt.Sprintf("docker build --no-cache -t %s -f %s .", tag, dockerfile)
+	buildArgs := fmt.Sprintf("docker build -t %s -f %s .", tag, dockerfile)
 	build := exec.Command("/bin/bash", "-c", buildArgs)
 	start := time.Now()
 	if _, err := run(build); err != nil {
