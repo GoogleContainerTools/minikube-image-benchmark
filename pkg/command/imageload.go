@@ -9,7 +9,7 @@ import (
 func RunImageLoad(image string, profile string) (float64, error) {
 	// build
 	dockerfile := fmt.Sprintf("testdata/Dockerfile.%s", image)
-	build := exec.Command("docker", "build", "--no-cache", "-t", "benchmark-image", "-f", dockerfile, ".")
+	build := exec.Command("docker", "build", "-t", "benchmark-image", "-f", dockerfile, ".")
 	start := time.Now()
 	if _, err := run(build); err != nil {
 		return 0, fmt.Errorf("failed to build via image load: %v", err)
