@@ -28,6 +28,17 @@ func main() {
 	}
 	defer command.DeleteMinikube(*profile)
 
+	if err := command.SetDockerInsecureRegistry(*profile); err != nil {
+		log.Printf("failed to set docker insecre registry: %v", err)
+		return
+	}
+
+	// StartDockerInsecureRegistry restarts Docker, so need to start minikube again
+	if err := command.StartMinikube(*profile); err != nil {
+		log.Printf("failed to start minikube: %v", err)
+		return
+	}
+
 	results, err := benchmark.Run(*runs, *profile)
 	if err != nil {
 		log.Printf("failed running benchmarks: %v", err)
