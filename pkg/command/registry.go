@@ -26,13 +26,10 @@ func RunRegistry(image string, profile string) (float64, error) {
 	elapsed := time.Now().Sub(start)
 
 	// verify
-	getIP := exec.Command("./minikube", "-p", profile, "ip")
-	ip, err := run(getIP)
+	ip, err := minikubeIP(profile)
 	if err != nil {
-		return 0, fmt.Errorf("failed to get minikube ip: %v", err)
+		return 0, err
 	}
-	// output contains newline char, strip it out
-	ip = ip[:len(ip)-1]
 
 	verifyArgs := fmt.Sprintf("curl http://%s:5000/v2/_catalog | grep benchmark-registry", ip)
 	verify := exec.Command("/bin/bash", "-c", verifyArgs)

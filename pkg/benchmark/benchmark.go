@@ -25,7 +25,7 @@ type method struct {
 
 var Images = []string{"alpineFewLargeFiles", "alpineFewSmallFiles", "ubuntuFewLargeFiles", "ubuntuFewSmallFiles"}
 var Methods = []string{"image load", "docker-env", "registry"}
-var Iter = []string{ "iterative", " non-iterative"}
+var Iter = []string{" iterative", " non-iterative"}
 var methods = []method{
 	{
 		command.RunImageLoad,

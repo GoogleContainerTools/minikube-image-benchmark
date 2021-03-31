@@ -28,3 +28,15 @@ func DeleteMinikube(profile string) error {
 	}
 	return nil
 }
+
+func minikubeIP(profile string) (string, error) {
+	c := exec.Command("./minikube", "-p", profile, "ip")
+	ip, err := run(c)
+	if err != nil {
+		return "", fmt.Errorf("failed to get minikube ip: %v", err)
+	}
+	// output contains newline char, strip it out
+	ip = ip[:len(ip)-1]
+
+	return ip, nil
+}
