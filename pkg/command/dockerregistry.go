@@ -15,7 +15,7 @@ func SetDockerInsecureRegistry(profile string) error {
 
 	// create docker daemon.json
 	thing := "sudo touch /etc/docker/daemon.json"
-	c = exec.Command("/bin/bash", "-c", thing)
+	c := exec.Command("/bin/bash", "-c", thing)
 	if _, err := run(c); err != nil {
 		return fmt.Errorf("failed to create file: %v", err)
 	}
