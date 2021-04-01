@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// RunImageLoad builds the provided image using the image load method and returns the run time.
 func RunImageLoad(image string, profile string) (float64, error) {
 	// build
 	dockerfile := fmt.Sprintf("testdata/Dockerfile.%s", image)
@@ -36,6 +37,7 @@ func RunImageLoad(image string, profile string) (float64, error) {
 	return elapsed.Seconds(), nil
 }
 
+// ClearImageLoadCache clears out caching related to the image load method.
 func ClearImageLoadCache(profile string) error {
 	// delete image from minikube to prevent caching
 	deleteMinikubeImageArgs := fmt.Sprintf("eval $(./minikube -p %s docker-env) && docker image rm benchmark-image:latest", profile)

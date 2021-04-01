@@ -1,3 +1,5 @@
+// Package benchmark runs benchmarks on different image build/push methods, and calculates the average
+// run time and standard deviation for each run.
 package benchmark
 
 import (
@@ -15,6 +17,7 @@ type aggregatedRunResult struct {
 	Std float64
 }
 
+// AggregatedResultsMatrix is a map containing the run results for every image method combination.
 type AggregatedResultsMatrix map[string]map[string]aggregatedRunResult
 
 type method struct {
@@ -23,9 +26,15 @@ type method struct {
 	name       string
 }
 
+// Images is the list of all the images to use for benchmarking
 var Images = []string{"alpineFewLargeFiles", "alpineFewSmallFiles", "ubuntuFewLargeFiles", "ubuntuFewSmallFiles"}
+
+// Methods is a list of all the methods to use for benchmarking
 var Methods = []string{"image load", "docker-env", "registry"}
+
+// Iter contains the two flows that are benchmarked
 var Iter = []string{" iterative", " non-iterative"}
+
 var methods = []method{
 	{
 		command.RunImageLoad,
@@ -43,6 +52,7 @@ var methods = []method{
 		"registry",
 	}}
 
+// Run runs all the benchmarking combinations and returns the average run time and standard deviation for each combination.
 func Run(runs int, profile string) (AggregatedResultsMatrix, error) {
 	modes := []func(runs int, profile string, image string, method method, imageResults map[string][]float64) error{
 		runIterative,
@@ -73,6 +83,8 @@ func Run(runs int, profile string) (AggregatedResultsMatrix, error) {
 	return aggregateResults(results), nil
 }
 
+// runIterative runs a benchmark using the iteratvie flow, which means changing the binary in between each run,
+// mimicing an iterative flow, the cache is cleared once all the runs are complete.
 func runIterative(runs int, profile string, image string, method method, imageResults map[string][]float64) error {
 	name := method.name + Iter[0]
 	fmt.Printf("\nRunning %s on %s\n", image, name)
@@ -94,6 +106,8 @@ func runIterative(runs int, profile string, image string, method method, imageRe
 	return nil
 }
 
+// runNonIterative runs a branchmark using the non-iterative flow, which means clearing the cache after each run,
+// idealy starting fresh everytime.
 func runNonIterative(runs int, profile string, image string, method method, imageResults map[string][]float64) error {
 	name := method.name + Iter[1]
 	fmt.Printf("\nRunning %s on %s\n", image, name)
@@ -112,6 +126,8 @@ func runNonIterative(runs int, profile string, image string, method method, imag
 	return nil
 }
 
+// buildExampleApp builds the example app and sets the ldflag using the provided num.
+// This allows the app the easily be changed, helping mimic the iterative workflow.
 func buildExampleApp(num int) error {
 	cArgs := fmt.Sprintf(`go build -o out/exampleApp -ldflags="-X 'main.Num=%d'" testdata/exampleApp/main.go`, num)
 	c := exec.Command("/bin/bash", "-c", cArgs)

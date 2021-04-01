@@ -1,3 +1,4 @@
+// Package csv handles writing the results of the benchmark out to a csv file.
 package csv
 
 import (
@@ -9,6 +10,7 @@ import (
 	"benchmark/pkg/benchmark"
 )
 
+// WriteTo writes the benchmarking results out to a csv.
 func WriteTo(ag benchmark.AggregatedResultsMatrix) error {
 	records := [][]string{{"image"}}
 	for _, method := range benchmark.Methods {
