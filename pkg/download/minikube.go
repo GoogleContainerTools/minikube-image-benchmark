@@ -7,7 +7,8 @@ import (
 	"strings"
 )
 
-func downloadMinikube() error {
+// getNewestMinikube checks if a newer version of minikube exists and downloads it if there is.
+func getNewestMinikube() error {
 	exists, err := minikubeExists()
 	if err != nil {
 		return err
@@ -36,9 +37,10 @@ func downloadMinikube() error {
 		return fmt.Errorf("failed to delete existing minikube binary: %v", err)
 	}
 	fmt.Println("Newer version of minikube detected")
-	return downloadMinikube()
+	return getNewestMinikube()
 }
 
+// chmodMinikube makes the minikube binary executable.
 func chmodMinikube() error {
 	c := exec.Command("chmod", "+x", "./minikube")
 	if err := c.Run(); err != nil {
@@ -47,6 +49,7 @@ func chmodMinikube() error {
 	return nil
 }
 
+// minikube exists checks if a version of minikube is already in the benchmarking directory.
 func minikubeExists() (bool, error) {
 	_, err := os.Stat("./minikube")
 	if os.IsNotExist(err) {
@@ -58,6 +61,7 @@ func minikubeExists() (bool, error) {
 	return true, nil
 }
 
+// getCurrSHA() gets the SHA of the current version of minikube in the benchmarking directory.
 func getCurrSHA() (string, error) {
 	c := exec.Command("sha256sum", "./minikube")
 	o, err := c.CombinedOutput()
@@ -68,6 +72,7 @@ func getCurrSHA() (string, error) {
 	return currSHA, nil
 }
 
+// getLatestSHA gets the SHA of the latest version of minikube.
 func getLatestSHA() (string, error) {
 	c := exec.Command("/bin/bash", "-c", "curl -sL https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64.sha256")
 	o, err := c.CombinedOutput()

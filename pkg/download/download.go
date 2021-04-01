@@ -1,3 +1,4 @@
+// Package download handles the downloading of files required for the benchmarking process.
 package download
 
 import (
@@ -17,7 +18,7 @@ func Files() error {
 	if err := downloadFileIfNotExists("https://golang.org/dl/go1.16.linux-amd64.tar.gz", "largeFile"); err != nil {
 		return err
 	}
-	if err := downloadMinikube(); err != nil {
+	if err := getNewestMinikube(); err != nil {
 		return err
 	}
 	return nil

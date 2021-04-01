@@ -1,3 +1,5 @@
+// The benchmark command is a utility that benchmarks different image build/push methods, calculates the average
+// run time for each, and outputs the result to a csv file.
 package main
 
 import (

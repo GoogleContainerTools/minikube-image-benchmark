@@ -5,6 +5,7 @@ import (
 	"os/exec"
 )
 
+// StartMinikube starts minikube and enables the registry addon.
 func StartMinikube(profile string) error {
 	fmt.Printf("Starting minikube...\n")
 	start := exec.Command("./minikube", "start", "-p", profile, "--driver", "docker")
@@ -20,6 +21,7 @@ func StartMinikube(profile string) error {
 	return nil
 }
 
+// DeleteMinikube deletes minikube.
 func DeleteMinikube(profile string) error {
 	fmt.Printf("Deleting minikube...\n")
 	delete := exec.Command("./minikube", "delete", "-p", profile)
@@ -29,6 +31,7 @@ func DeleteMinikube(profile string) error {
 	return nil
 }
 
+// minikube gets the IP of the running minikube instance.
 func minikubeIP(profile string) (string, error) {
 	c := exec.Command("./minikube", "-p", profile, "ip")
 	ip, err := run(c)

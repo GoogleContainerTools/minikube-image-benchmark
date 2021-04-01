@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// RunDockerEnv builds the provided image using the docker-env method and returns the run time.
 func RunDockerEnv(image string, profile string) (float64, error) {
 	// build
 	buildArgs := fmt.Sprintf("eval $(./minikube -p %s docker-env) && docker build -t benchmark-env -f testdata/Dockerfile.%s .", profile, image)
@@ -19,6 +20,7 @@ func RunDockerEnv(image string, profile string) (float64, error) {
 	return elapsed.Seconds(), nil
 }
 
+// ClearDockerEnvCache clears out caching related to the docker-env method.
 func ClearDockerEnvCache(profile string) error {
 	// delete image to prevent caching
 	deleteArgs := fmt.Sprintf("eval $(./minikube -p %s docker-env) && docker image rm benchmark-env:latest", profile)

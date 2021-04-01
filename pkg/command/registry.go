@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// RunRegistry builds and pushes the provided image using the registry addon method and returns the run time.
 func RunRegistry(image string, profile string) (float64, error) {
 	// build
 	dockerfile := fmt.Sprintf("testdata/Dockerfile.%s", image)
@@ -44,6 +45,8 @@ func RunRegistry(image string, profile string) (float64, error) {
 	return elapsed.Seconds(), nil
 }
 
+// ClearRegistryCache clears out caching related to the registry addon method.
 func ClearRegistryCache(profile string) error {
+	// TODO add cache clearing
 	return nil
 }
