@@ -44,67 +44,72 @@ var methods = []method{
 	}}
 
 func Run(runs int, profile string) (AggregatedResultsMatrix, error) {
-	results, err := runIterative(runs, profile, runResultsMatrix{})
-	if err != nil {
-		return nil, err
+	modes := []func(runs int, profile string, image string, method method, imageResults map[string][]float64) error{
+		runIterative,
+		runNonIterative,
 	}
-	results, err = runNonIterative(runs, profile, results)
-	if err != nil {
-		return nil, err
-	}
-	return aggregateResults(results), nil
-}
 
-func runIterative(runs int, profile string, results runResultsMatrix) (runResultsMatrix, error) {
-	for _, image := range Images {
-		imageResults := map[string][]float64{}
-		for _, method := range methods {
-			name := method.name + Iter[0]
-			fmt.Printf("\nRunning %s on %s\n", image, name)
-			for i := 0; i < runs; i++ {
-				if err := buildExampleApp(i); err != nil {
-					return nil, err
-				}
-				runTime, err := method.bench(image, profile)
-				if err != nil {
-					return nil, fmt.Errorf("failed running benchmark %s on %s: %v", image, name, err)
-				}
-				imageResults[name] = append(imageResults[name], runTime)
-				displayRun(i+1, runTime)
-			}
-			if err := method.cacheClear(profile); err != nil {
-				return nil, fmt.Errorf("failed to clear cache: %v", err)
-			}
-		}
-		results[image] = imageResults
-	}
-	return results, nil
-}
+	results := runResultsMatrix{}
 
-func runNonIterative(runs int, profile string, results runResultsMatrix) (runResultsMatrix, error) {
 	if err := buildExampleApp(0); err != nil {
 		return nil, err
 	}
-	for _, image := range Images {
-		imageResults := results[image]
-		for _, method := range methods {
-			name := method.name + Iter[1]
-			fmt.Printf("\nRunning %s on %s\n", image, name)
-			for i := 0; i < runs; i++ {
-				runTime, err := method.bench(image, profile)
-				if err != nil {
-					return nil, fmt.Errorf("failed running benchmark %s on %s: %v", image, name, err)
-				}
-				imageResults[name] = append(imageResults[name], runTime)
-				displayRun(i+1, runTime)
-				if err := method.cacheClear(profile); err != nil {
-					return nil, fmt.Errorf("failed to clear cache: %v", err)
+
+	for _, mode := range modes {
+		for _, image := range Images {
+			imageResults := results[image]
+			if imageResults == nil {
+				imageResults = map[string][]float64{}
+			}
+			for _, method := range methods {
+				if err := mode(runs, profile, image, method, imageResults); err != nil {
+					return nil, err
 				}
 			}
+			results[image] = imageResults
 		}
-		results[image] = imageResults
 	}
-	return results, nil
+
+	return aggregateResults(results), nil
+}
+
+func runIterative(runs int, profile string, image string, method method, imageResults map[string][]float64) error {
+	name := method.name + Iter[0]
+	fmt.Printf("\nRunning %s on %s\n", image, name)
+	for i := 0; i < runs; i++ {
+		if err := buildExampleApp(i); err != nil {
+			return err
+		}
+		runTime, err := method.bench(image, profile)
+		if err != nil {
+			return fmt.Errorf("failed running benchmark %s on %s: %v", image, name, err)
+		}
+		imageResults[name] = append(imageResults[name], runTime)
+		displayRun(i+1, runTime)
+	}
+	if err := method.cacheClear(profile); err != nil {
+		return fmt.Errorf("failed to clear cache: %v", err)
+	}
+
+	return nil
+}
+
+func runNonIterative(runs int, profile string, image string, method method, imageResults map[string][]float64) error {
+	name := method.name + Iter[1]
+	fmt.Printf("\nRunning %s on %s\n", image, name)
+	for i := 0; i < runs; i++ {
+		runTime, err := method.bench(image, profile)
+		if err != nil {
+			return fmt.Errorf("failed running benchmark %s on %s: %v", image, name, err)
+		}
+		imageResults[name] = append(imageResults[name], runTime)
+		displayRun(i+1, runTime)
+		if err := method.cacheClear(profile); err != nil {
+			return fmt.Errorf("failed to clear cache: %v", err)
+		}
+	}
+
+	return nil
 }
 
 func buildExampleApp(num int) error {
