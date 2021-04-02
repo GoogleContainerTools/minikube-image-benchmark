@@ -39,23 +39,9 @@ func RunImageLoad(image string, profile string) (float64, error) {
 
 // ClearImageLoadCache clears out caching related to the image load method.
 func ClearImageLoadCache(profile string) error {
-	// delete image from minikube to prevent caching
-	deleteMinikubeImageArgs := fmt.Sprintf("eval $(./minikube -p %s docker-env) && docker image rm benchmark-image:latest", profile)
-	deleteMinikubeImage := exec.Command("/bin/bash", "-c", deleteMinikubeImageArgs)
-	if _, err := run(deleteMinikubeImage); err != nil {
-		return fmt.Errorf("failed to delete minikube image: %v", err)
+	if err := minikubeDockerSystemPrune(profile); err != nil {
+		return err
 	}
 
-	// delete image from Docker to prevent caching
-	deleteDockerImage := exec.Command("docker", "image", "rm", "benchmark-image:latest")
-	if _, err := run(deleteDockerImage); err != nil {
-		return fmt.Errorf("failed to delete docker image: %v", err)
-	}
-
-	// clear builder cache, must be run after the image delete
-	clearBuildCache := exec.Command("docker", "builder", "prune", "-f")
-	if _, err := run(clearBuildCache); err != nil {
-		return fmt.Errorf("failed to clear builder cache: %v", err)
-	}
-	return nil
+	return DockerSystemPrune()
 }

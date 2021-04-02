@@ -29,6 +29,7 @@ func main() {
 		log.Fatal(err)
 	}
 	defer command.DeleteMinikube(*profile)
+	defer command.DockerSystemPrune()
 
 	if err := command.SetDockerInsecureRegistry(*profile); err != nil {
 		log.Printf("failed to set docker insecre registry: %v", err)
