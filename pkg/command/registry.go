@@ -47,6 +47,21 @@ func RunRegistry(image string, profile string) (float64, error) {
 
 // ClearRegistryCache clears out caching related to the registry addon method.
 func ClearRegistryCache(profile string) error {
-	// TODO add cache clearing
+	// delete image from Docker to prevent caching
+	ip, err := minikubeIP(profile)
+	if err != nil {
+		return err
+	}
+	tag := fmt.Sprintf("%s:5000/benchmark-registry:latest", ip)
+	deleteDockerImage := exec.Command("docker", "image", "rm", tag)
+	if _, err := run(deleteDockerImage); err != nil {
+		return fmt.Errorf("failed to delete docker image: %v", err)
+	}
+
+	// clear builder cache, must be run after the image delete
+	clearBuildCache := exec.Command("docker", "builder", "prune", "-f")
+	if _, err := run(clearBuildCache); err != nil {
+		return fmt.Errorf("failed to clear builder cache: %v", err)
+	}
 	return nil
 }
