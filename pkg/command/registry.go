@@ -47,5 +47,8 @@ func RunRegistry(image string, profile string) (float64, error) {
 
 // ClearRegistryCache clears out caching related to the registry addon method.
 func ClearRegistryCache(profile string) error {
+	if err := minikubeDockerSystemPrune(profile); err != nil {
+		return err
+	}
 	return DockerSystemPrune()
 }
