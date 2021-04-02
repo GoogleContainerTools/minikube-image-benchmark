@@ -1,0 +1,5 @@
+FROM openjdk:11-slim
+COPY largeFile /largeFile1
+COPY largeFile /largeFile2
+COPY out/exampleApp /
+RUN /exampleApp

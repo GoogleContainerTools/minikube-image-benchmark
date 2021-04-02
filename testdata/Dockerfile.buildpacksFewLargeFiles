@@ -1,0 +1,5 @@
+FROM gcr.io/buildpacks/builder:v1
+COPY largeFile /largeFile1
+COPY largeFile /largeFile2
+COPY out/exampleApp /
+RUN /exampleApp

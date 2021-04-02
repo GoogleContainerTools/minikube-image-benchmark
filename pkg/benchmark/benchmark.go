@@ -27,7 +27,7 @@ type method struct {
 }
 
 // Images is the list of all the images to use for benchmarking
-var Images = []string{"alpineFewLargeFiles", "alpineFewSmallFiles", "ubuntuFewLargeFiles", "ubuntuFewSmallFiles"}
+var Images = []string{"alpineFewLargeFiles", "alpineFewSmallFiles", "buildpacksFewLargeFiles", "buildpacksFewSmallFiles", "openjdkFewLargeFiles", "openjdkFewSmallFiles", "ubuntuFewLargeFiles", "ubuntuFewSmallFiles"}
 
 // Methods is a list of all the methods to use for benchmarking
 var Methods = []string{"image load", "docker-env", "registry"}
