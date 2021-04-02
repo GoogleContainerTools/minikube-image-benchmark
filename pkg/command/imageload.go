@@ -42,6 +42,5 @@ func ClearImageLoadCache(profile string) error {
 	if err := minikubeDockerSystemPrune(profile); err != nil {
 		return err
 	}
-
 	return DockerSystemPrune()
 }
