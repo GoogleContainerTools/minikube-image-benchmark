@@ -22,17 +22,5 @@ func RunDockerEnv(image string, profile string) (float64, error) {
 
 // ClearDockerEnvCache clears out caching related to the docker-env method.
 func ClearDockerEnvCache(profile string) error {
-	// delete image to prevent caching
-	deleteArgs := fmt.Sprintf("eval $(./minikube -p %s docker-env) && docker image rm benchmark-env:latest", profile)
-	deleteImage := exec.Command("/bin/bash", "-c", deleteArgs)
-	if _, err := run(deleteImage); err != nil {
-		return fmt.Errorf("failed to delete image: %v", err)
-	}
-	// clear builder cache, must be run after the image delete
-	clearBuilderCacheArgs := fmt.Sprintf("eval $(./minikube -p %s docker-env) && docker builder prune -f", profile)
-	clearBuilderCache := exec.Command("/bin/bash", "-c", clearBuilderCacheArgs)
-	if _, err := run(clearBuilderCache); err != nil {
-		return fmt.Errorf("failed to clear builder cache: %v", err)
-	}
-	return nil
+	return minikubeDockerSystemPrune(profile)
 }
