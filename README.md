@@ -4,6 +4,14 @@
 The purpose of this project is to create a simple to run application that benchmarks different methods of building & pushing an image to minikube.
 Each benchmark is run multiple times and the average run time for the runs is calculated and output to a csv file to review the results.
 
+## Warning!
+This benchmarking tool is going to make changes to your Docker and minikube instances, so don't run if you don't want those to be disturbed.
+For example, the `/etc/docker/daemon.json` is modified and Docker is restarted, the following commands are run as well
+```
+minikube delete --all
+docker system prune -a -f
+```
+
 ## Requirements
 * Docker needs to be installed
 * Currently only supported on Linux (only tested on Debian)
