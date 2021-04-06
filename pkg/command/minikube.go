@@ -5,29 +5,31 @@ import (
 	"os/exec"
 )
 
-// StartMinikube starts minikube and enables the registry addon.
-func StartMinikube(profile string) error {
-	fmt.Printf("Starting minikube...\n")
-	start := exec.Command("./minikube", "start", "-p", profile, "--driver", "docker")
-	if _, err := run(start); err != nil {
+func startMinikube(profile string, driver string) error {
+	c := exec.Command("./minikube", "start", "-p", profile, "--driver", driver)
+	if _, err := run(c); err != nil {
 		return fmt.Errorf("failed to start minikube: %v", err)
 	}
 
-	enableRegistry := exec.Command("./minikube", "-p", profile, "addons", "enable", "registry")
-	if _, err := run(enableRegistry); err != nil {
-		DeleteMinikube(profile)
-		return fmt.Errorf("failed to enable registry addon: %v", err)
-	}
 	return nil
 }
 
-// DeleteMinikube deletes minikube.
+func enableRegistryAddon(profile string) error {
+	c := exec.Command("./minikube", "-p", profile, "addons", "enable", "registry")
+	if _, err := run(c); err != nil {
+		return fmt.Errorf("failed to enable registry addon: %v", err)
+	}
+
+	return nil
+}
+
+// DeleteMinikube deletes the minikube cluster.
 func DeleteMinikube(profile string) error {
-	fmt.Printf("Deleting minikube...\n")
-	delete := exec.Command("./minikube", "delete", "-p", profile)
-	if _, err := run(delete); err != nil {
+	c := exec.Command("./minikube", "delete", "--all")
+	if _, err := run(c); err != nil {
 		return fmt.Errorf("failed to delete minikube: %v", err)
 	}
+
 	return nil
 }
 

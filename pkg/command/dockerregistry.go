@@ -5,8 +5,8 @@ import (
 	"os/exec"
 )
 
-// SetDockerInsecureRegistry sets minikube's IP in Docker's insecure registry
-func SetDockerInsecureRegistry(profile string) error {
+// setDockerInsecureRegistry sets minikube's IP in Docker's insecure registry
+func setDockerInsecureRegistry(profile string) error {
 	// get minikue IP
 	ip, err := minikubeIP(profile)
 	if err != nil {
@@ -14,14 +14,14 @@ func SetDockerInsecureRegistry(profile string) error {
 	}
 
 	// create docker daemon.json
-	thing := "sudo touch /etc/docker/daemon.json"
-	c := exec.Command("/bin/bash", "-c", thing)
+	args := "sudo touch /etc/docker/daemon.json"
+	c := exec.Command("/bin/bash", "-c", args)
 	if _, err := run(c); err != nil {
 		return fmt.Errorf("failed to create file: %v", err)
 	}
 
 	// set IP in Docker insecure registry
-	args := fmt.Sprintf(`sudo tee /etc/docker/daemon.json << EOF
+	args = fmt.Sprintf(`sudo tee /etc/docker/daemon.json << EOF
 {
   "insecure-registries" : ["%s:5000"]
 }

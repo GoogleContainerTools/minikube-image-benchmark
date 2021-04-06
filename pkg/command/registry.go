@@ -6,6 +6,24 @@ import (
 	"time"
 )
 
+// StartMinikubeRegistry starts minikube for docker-env.
+func StartMinikubeRegistry(profile string) error {
+	if err := startMinikube(profile, "docker"); err != nil {
+		return err
+	}
+
+	if err := setDockerInsecureRegistry(profile); err != nil {
+		return err
+	}
+
+	// setDockerInsecureRegistry restarts docker, so minikube needs to be restarted
+	if err := startMinikube(profile, "docker"); err != nil {
+		return err
+	}
+
+	return enableRegistryAddon(profile)
+}
+
 // RunRegistry builds and pushes the provided image using the registry addon method and returns the run time.
 func RunRegistry(image string, profile string) (float64, error) {
 	// build

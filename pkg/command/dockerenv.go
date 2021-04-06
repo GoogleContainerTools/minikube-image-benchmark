@@ -6,6 +6,11 @@ import (
 	"time"
 )
 
+// StartMinikubeDockerEnv starts minikube for docker-env.
+func StartMinikubeDockerEnv(profile string) error {
+	return startMinikube(profile, "docker")
+}
+
 // RunDockerEnv builds the provided image using the docker-env method and returns the run time.
 func RunDockerEnv(image string, profile string) (float64, error) {
 	// build

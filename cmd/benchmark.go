@@ -7,7 +7,6 @@ import (
 	"log"
 
 	"benchmark/pkg/benchmark"
-	"benchmark/pkg/command"
 	"benchmark/pkg/csv"
 	"benchmark/pkg/download"
 )
@@ -23,23 +22,6 @@ func main() {
 
 	if err := download.Files(); err != nil {
 		log.Fatal(err)
-	}
-
-	if err := command.StartMinikube(*profile); err != nil {
-		log.Fatal(err)
-	}
-	defer command.DeleteMinikube(*profile)
-	defer command.DockerSystemPrune()
-
-	if err := command.SetDockerInsecureRegistry(*profile); err != nil {
-		log.Printf("failed to set docker insecre registry: %v", err)
-		return
-	}
-
-	// StartDockerInsecureRegistry restarts Docker, so need to start minikube again
-	if err := command.StartMinikube(*profile); err != nil {
-		log.Printf("failed to start minikube: %v", err)
-		return
 	}
 
 	results, err := benchmark.Run(*runs, *profile)

@@ -21,6 +21,7 @@ type aggregatedRunResult struct {
 type AggregatedResultsMatrix map[string]map[string]aggregatedRunResult
 
 type method struct {
+	startMinikube func(profile string) error
 	bench      func(image string, profile string) (float64, error)
 	cacheClear func(profile string) error
 	name       string
@@ -37,16 +38,19 @@ var Iter = []string{" iterative", " non-iterative"}
 
 var methods = []method{
 	{
+		command.StartMinikubeImageLoad,
 		command.RunImageLoad,
 		command.ClearImageLoadCache,
 		"image load",
 	},
 	{
+		command.StartMinikubeDockerEnv,
 		command.RunDockerEnv,
 		command.ClearDockerEnvCache,
 		"docker-env",
 	},
 	{
+		command.StartMinikubeRegistry,
 		command.RunRegistry,
 		command.ClearRegistryCache,
 		"registry",
@@ -65,18 +69,26 @@ func Run(runs int, profile string) (AggregatedResultsMatrix, error) {
 		return nil, err
 	}
 
-	for _, mode := range modes {
-		for _, image := range Images {
-			imageResults := results[image]
-			if imageResults == nil {
-				imageResults = map[string][]float64{}
-			}
-			for _, method := range methods {
+	for _, method := range methods {
+		if err := method.startMinikube(profile); err != nil {
+			return nil, err
+		}
+
+		for _, mode := range modes {
+			for _, image := range Images {
+				imageResults := results[image]
+				if imageResults == nil {
+					imageResults = map[string][]float64{}
+				}
 				if err := mode(runs, profile, image, method, imageResults); err != nil {
 					return nil, err
 				}
+				results[image] = imageResults
 			}
-			results[image] = imageResults
+		}
+
+		if err := command.DeleteMinikube(profile); err != nil {
+			return nil, err
 		}
 	}
 
