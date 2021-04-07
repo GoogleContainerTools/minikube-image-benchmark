@@ -5,8 +5,10 @@ import (
 	"os/exec"
 )
 
-func startMinikube(profile string, driver string) error {
-	c := exec.Command("./minikube", "start", "-p", profile, "--driver", driver)
+func startMinikube(profile string, args ...string) error {
+	a := []string{"start", "-p", profile}
+	a = append(a, args...)
+	c := exec.Command("./minikube", a...)
 	if _, err := run(c); err != nil {
 		return fmt.Errorf("failed to start minikube: %v", err)
 	}
@@ -24,7 +26,7 @@ func enableRegistryAddon(profile string) error {
 }
 
 // DeleteMinikube deletes the minikube cluster.
-func DeleteMinikube(profile string) error {
+func DeleteMinikube() error {
 	c := exec.Command("./minikube", "delete", "--all")
 	if _, err := run(c); err != nil {
 		return fmt.Errorf("failed to delete minikube: %v", err)
