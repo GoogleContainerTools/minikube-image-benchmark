@@ -87,7 +87,7 @@ func Run(runs int, profile string) (AggregatedResultsMatrix, error) {
 			}
 		}
 
-		if err := command.DeleteMinikube(profile); err != nil {
+		if err := command.DeleteMinikube(); err != nil {
 			return nil, err
 		}
 	}

@@ -7,6 +7,7 @@ import (
 	"log"
 
 	"benchmark/pkg/benchmark"
+	"benchmark/pkg/command"
 	"benchmark/pkg/csv"
 	"benchmark/pkg/download"
 )
@@ -23,6 +24,8 @@ func main() {
 	if err := download.Files(); err != nil {
 		log.Fatal(err)
 	}
+
+	defer command.DeleteMinikube()
 
 	results, err := benchmark.Run(*runs, *profile)
 	if err != nil {

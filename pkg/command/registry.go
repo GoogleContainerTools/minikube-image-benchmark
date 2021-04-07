@@ -8,7 +8,7 @@ import (
 
 // StartMinikubeRegistry starts minikube for docker-env.
 func StartMinikubeRegistry(profile string) error {
-	if err := startMinikube(profile, "docker"); err != nil {
+	if err := startMinikube(profile); err != nil {
 		return err
 	}
 
@@ -17,7 +17,7 @@ func StartMinikubeRegistry(profile string) error {
 	}
 
 	// setDockerInsecureRegistry restarts docker, so minikube needs to be restarted
-	if err := startMinikube(profile, "docker"); err != nil {
+	if err := startMinikube(profile); err != nil {
 		return err
 	}
 

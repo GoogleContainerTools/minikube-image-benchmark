@@ -8,7 +8,7 @@ import (
 
 // StartMinikubeImageLoad starts minikube for docker-env.
 func StartMinikubeImageLoad(profile string) error {
-	return startMinikube(profile, "docker")
+	return startMinikube(profile)
 }
 
 // RunImageLoad builds the provided image using the image load method and returns the run time.
