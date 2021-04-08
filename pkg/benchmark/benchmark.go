@@ -66,6 +66,18 @@ var methods = []method{
 		command.RunRegistry,
 		command.ClearRegistryCache,
 		"registry containerd",
+	},
+	{
+		command.StartMinikubeImageLoadCrio,
+		command.RunImageLoad,
+		command.ClearImageLoadCache,
+		"image load crio",
+	},
+	{
+		command.StartMinikubeRegistryCrio,
+		command.RunRegistry,
+		command.ClearRegistryCache,
+		"registry crio",
 	}}
 
 // Run runs all the benchmarking combinations and returns the average run time and standard deviation for each combination.

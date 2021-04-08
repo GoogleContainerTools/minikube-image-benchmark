@@ -40,7 +40,24 @@ func StartMinikubeRegistryContainerd(profile string) error {
 	}
 
 	return enableRegistryAddon(profile)
+}
 
+// StartMinikubeRegistryCrio start minikube for crio registry.
+func StartMinikubeRegistryCrio(profile string) error {
+	if err := startMinikube(profile, "--container-runtime=cri-o"); err != nil {
+		return err
+	}
+
+	if err := setDockerInsecureRegistry(profile); err != nil {
+		return err
+	}
+
+	// setDockerInsecureRegistry restarts docker, so minikube needs to be restarted
+	if err := startMinikube(profile, "--container-runtime=cri-o"); err != nil {
+		return err
+	}
+
+	return enableRegistryAddon(profile)
 }
 
 // RunRegistry builds and pushes the provided image using the registry addon method and returns the run time.
