@@ -16,6 +16,11 @@ func StartMinikubeImageLoadContainerd(profile string) error {
 	return startMinikube(profile, "--container-runtime=containerd")
 }
 
+// StartMinikubeImageLoadCrio start minikube for crio image load.
+func StartMinikubeImageLoadCrio(profile string) error {
+	return startMinikube(profile, "--container-runtime=cri-o")
+}
+
 // RunImageLoad builds the provided image using the image load method and returns the run time.
 func RunImageLoad(image string, profile string) (float64, error) {
 	// build
