@@ -6,9 +6,14 @@ import (
 	"time"
 )
 
-// StartMinikubeImageLoad starts minikube for docker-env.
-func StartMinikubeImageLoad(profile string) error {
+// StartMinikubeImageLoadDocker starts minikube for docker image load.
+func StartMinikubeImageLoadDocker(profile string) error {
 	return startMinikube(profile)
+}
+
+// StartMinikubeImageLoadContainerd starts minikube for containerd image load.
+func StartMinikubeImageLoadContainerd(profile string) error {
+	return startMinikube(profile, "--container-runtime=containerd")
 }
 
 // RunImageLoad builds the provided image using the image load method and returns the run time.
