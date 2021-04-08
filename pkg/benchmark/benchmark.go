@@ -22,9 +22,9 @@ type AggregatedResultsMatrix map[string]map[string]aggregatedRunResult
 
 type method struct {
 	startMinikube func(profile string) error
-	bench      func(image string, profile string) (float64, error)
-	cacheClear func(profile string) error
-	name       string
+	bench         func(image string, profile string) (float64, error)
+	cacheClear    func(profile string) error
+	name          string
 }
 
 // Images is the list of all the images to use for benchmarking
@@ -38,22 +38,34 @@ var Iter = []string{" iterative", " non-iterative"}
 
 var methods = []method{
 	{
-		command.StartMinikubeImageLoad,
+		command.StartMinikubeImageLoadDocker,
 		command.RunImageLoad,
 		command.ClearImageLoadCache,
-		"image load",
+		"image load docker",
 	},
 	{
 		command.StartMinikubeDockerEnv,
 		command.RunDockerEnv,
 		command.ClearDockerEnvCache,
-		"docker-env",
+		"docker-env docker",
 	},
 	{
-		command.StartMinikubeRegistry,
+		command.StartMinikubeRegistryDocker,
 		command.RunRegistry,
 		command.ClearRegistryCache,
-		"registry",
+		"registry docker",
+	},
+	{
+		command.StartMinikubeImageLoadContainerd,
+		command.RunImageLoad,
+		command.ClearImageLoadCache,
+		"image load containerd",
+	},
+	{
+		command.StartMinikubeRegistryContainerd,
+		command.RunRegistry,
+		command.ClearRegistryCache,
+		"registry containerd",
 	}}
 
 // Run runs all the benchmarking combinations and returns the average run time and standard deviation for each combination.
