@@ -13,9 +13,9 @@ import (
 // WriteTo writes the benchmarking results out to a csv.
 func WriteTo(ag benchmark.AggregatedResultsMatrix) error {
 	records := [][]string{{"image"}}
-	for _, method := range benchmark.Methods {
+	for _, method := range benchmark.BenchMethods {
 		for _, iter := range benchmark.Iter {
-			records[0] = append(records[0], method+iter+" average", method+iter+" standard deviation")
+			records[0] = append(records[0], method.Name+iter+" average", method.Name+iter+" standard deviation")
 		}
 	}
 
@@ -27,9 +27,9 @@ func WriteTo(ag benchmark.AggregatedResultsMatrix) error {
 
 	for _, image := range benchmark.Images {
 		imageRecords := []string{image}
-		for _, method := range benchmark.Methods {
+		for _, method := range benchmark.BenchMethods {
 			for _, iter := range benchmark.Iter {
-				run := ag[image][method+iter]
+				run := ag[image][method.Name+iter]
 				imageRecords = append(imageRecords, fmt.Sprintf("%.2f", run.Avg), fmt.Sprintf("%.2f", run.Std))
 			}
 		}

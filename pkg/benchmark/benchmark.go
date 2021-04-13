@@ -24,19 +24,17 @@ type method struct {
 	startMinikube func(profile string) error
 	bench         func(image string, profile string) (float64, error)
 	cacheClear    func(profile string) error
-	name          string
+	Name          string
 }
 
 // Images is the list of all the images to use for benchmarking
-var Images = []string{"alpineFewLargeFiles", "alpineFewSmallFiles", "buildpacksFewLargeFiles", "buildpacksFewSmallFiles", "openjdkFewLargeFiles", "openjdkFewSmallFiles", "ubuntuFewLargeFiles", "ubuntuFewSmallFiles"}
-
-// Methods is a list of all the methods to use for benchmarking
-var Methods = []string{"image load", "docker-env", "registry"}
+var Images = []string{"alpineFewLargeFiles", "alpineFewSmallFiles", "alpineManyLargeFiles", "alpineManySmallFiles", "buildpacksFewLargeFiles", "buildpacksFewSmallFiles", "buildpacksManyLargeFiles", "buildpacksManySmallFiles", "openjdkFewLargeFiles", "openjdkFewSmallFiles", "openjdkManyLargeFiles", "openjdkManySmallFiles"}
 
 // Iter contains the two flows that are benchmarked
 var Iter = []string{" iterative", " non-iterative"}
 
-var methods = []method{
+// BenchMethods contains an array of benchmarking funcs
+var BenchMethods = []method{
 	{
 		command.StartMinikubeImageLoadDocker,
 		command.RunImageLoad,
@@ -78,6 +76,12 @@ var methods = []method{
 		command.RunRegistry,
 		command.ClearRegistryCache,
 		"registry crio",
+	},
+	{
+		command.StartKind,
+		command.RunKind,
+		command.ClearKindCache,
+		"kind",
 	}}
 
 // Run runs all the benchmarking combinations and returns the average run time and standard deviation for each combination.
@@ -93,7 +97,7 @@ func Run(runs int, profile string) (AggregatedResultsMatrix, error) {
 		return nil, err
 	}
 
-	for _, method := range methods {
+	for _, method := range BenchMethods {
 		if err := method.startMinikube(profile); err != nil {
 			return nil, err
 		}
@@ -111,7 +115,7 @@ func Run(runs int, profile string) (AggregatedResultsMatrix, error) {
 			}
 		}
 
-		if err := command.DeleteMinikube(); err != nil {
+		if err := command.Delete(); err != nil {
 			return nil, err
 		}
 	}
@@ -122,7 +126,7 @@ func Run(runs int, profile string) (AggregatedResultsMatrix, error) {
 // runIterative runs a benchmark using the iteratvie flow, which means changing the binary in between each run,
 // mimicing an iterative flow, the cache is cleared once all the runs are complete.
 func runIterative(runs int, profile string, image string, method method, imageResults map[string][]float64) error {
-	name := method.name + Iter[0]
+	name := method.Name + Iter[0]
 	fmt.Printf("\nRunning %s on %s\n", image, name)
 	for i := 0; i < runs; i++ {
 		if err := buildExampleApp(i); err != nil {
@@ -132,8 +136,11 @@ func runIterative(runs int, profile string, image string, method method, imageRe
 		if err != nil {
 			return fmt.Errorf("failed running benchmark %s on %s: %v", image, name, err)
 		}
-		imageResults[name] = append(imageResults[name], runTime)
 		displayRun(i+1, runTime)
+		if i == 0 {
+			continue
+		}
+		imageResults[name] = append(imageResults[name], runTime)
 	}
 	if err := method.cacheClear(profile); err != nil {
 		return fmt.Errorf("failed to clear cache: %v", err)
@@ -145,7 +152,7 @@ func runIterative(runs int, profile string, image string, method method, imageRe
 // runNonIterative runs a branchmark using the non-iterative flow, which means clearing the cache after each run,
 // idealy starting fresh everytime.
 func runNonIterative(runs int, profile string, image string, method method, imageResults map[string][]float64) error {
-	name := method.name + Iter[1]
+	name := method.Name + Iter[1]
 	fmt.Printf("\nRunning %s on %s\n", image, name)
 	for i := 0; i < runs; i++ {
 		runTime, err := method.bench(image, profile)
@@ -179,9 +186,9 @@ func aggregateResults(r runResultsMatrix) AggregatedResultsMatrix {
 	ag := AggregatedResultsMatrix{}
 	for _, image := range Images {
 		imageResults := map[string]aggregatedRunResult{}
-		for _, method := range Methods {
+		for _, method := range BenchMethods {
 			for _, iter := range Iter {
-				runs := r[image][method+iter]
+				runs := r[image][method.Name+iter]
 				var sum, std, count float64
 				for _, run := range runs {
 					sum += run
@@ -196,7 +203,7 @@ func aggregateResults(r runResultsMatrix) AggregatedResultsMatrix {
 					Avg: avg,
 					Std: std,
 				}
-				imageResults[method+iter] = agr
+				imageResults[method.Name+iter] = agr
 			}
 		}
 		ag[image] = imageResults

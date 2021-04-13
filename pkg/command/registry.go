@@ -8,43 +8,22 @@ import (
 
 // StartMinikubeRegistryDocker starts minikube for docker registry.
 func StartMinikubeRegistryDocker(profile string) error {
-	if err := startMinikube(profile); err != nil {
-		return err
-	}
-
-	if err := setDockerInsecureRegistry(profile); err != nil {
-		return err
-	}
-
-	// setDockerInsecureRegistry restarts docker, so minikube needs to be restarted
-	if err := startMinikube(profile); err != nil {
-		return err
-	}
-
-	return enableRegistryAddon(profile)
+	return startMinikube(profile, "docker")
 }
 
 // StartMinikubeRegistryContainerd starts minikube for containerd registry.
 func StartMinikubeRegistryContainerd(profile string) error {
-	if err := startMinikube(profile, "--container-runtime=containerd"); err != nil {
-		return err
-	}
-
-	if err := setDockerInsecureRegistry(profile); err != nil {
-		return err
-	}
-
-	// setDockerInsecureRegistry restarts docker, so minikube needs to be restarted
-	if err := startMinikube(profile, "--container-runtime=containerd"); err != nil {
-		return err
-	}
-
-	return enableRegistryAddon(profile)
+	return startMinikubeRegistry(profile, "containerd")
 }
 
 // StartMinikubeRegistryCrio start minikube for crio registry.
 func StartMinikubeRegistryCrio(profile string) error {
-	if err := startMinikube(profile, "--container-runtime=cri-o"); err != nil {
+	return startMinikubeRegistry(profile, "cri-o")
+}
+
+func startMinikubeRegistry(profile string, runtime string) error {
+	runtime = fmt.Sprintf("--container-runtime=%s", runtime)
+	if err := startMinikube(profile, runtime); err != nil {
 		return err
 	}
 
@@ -53,11 +32,12 @@ func StartMinikubeRegistryCrio(profile string) error {
 	}
 
 	// setDockerInsecureRegistry restarts docker, so minikube needs to be restarted
-	if err := startMinikube(profile, "--container-runtime=cri-o"); err != nil {
+	if err := startMinikube(profile, runtime); err != nil {
 		return err
 	}
 
 	return enableRegistryAddon(profile)
+
 }
 
 // RunRegistry builds and pushes the provided image using the registry addon method and returns the run time.

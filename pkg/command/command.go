@@ -14,3 +14,11 @@ func run(cmd *exec.Cmd) (string, error) {
 	}
 	return string(o), nil
 }
+
+func Delete() error {
+	if err := deleteMinikube(); err != nil {
+		return err
+	}
+
+	return deleteKind()
+}
