@@ -25,7 +25,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	defer command.DeleteMinikube()
+	defer command.Delete()
 
 	results, err := benchmark.Run(*runs, *profile)
 	if err != nil {

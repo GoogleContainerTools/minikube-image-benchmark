@@ -1,5 +1,0 @@
-FROM ubuntu:latest
-COPY smallFile /smallFile1
-COPY smallFile /smallFile2
-COPY out/exampleApp /
-RUN /exampleApp

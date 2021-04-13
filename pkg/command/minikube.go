@@ -25,8 +25,8 @@ func enableRegistryAddon(profile string) error {
 	return nil
 }
 
-// DeleteMinikube deletes the minikube cluster.
-func DeleteMinikube() error {
+// deleteMinikube deletes the minikube cluster.
+func deleteMinikube() error {
 	c := exec.Command("./minikube", "delete", "--all")
 	if _, err := run(c); err != nil {
 		return fmt.Errorf("failed to delete minikube: %v", err)

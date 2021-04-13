@@ -1,0 +1,23 @@
+FROM openjdk:11-slim
+COPY smallFile /smallFile1
+COPY smallFile /smallFile2
+COPY smallFile /smallFile3
+COPY smallFile /smallFile4
+COPY smallFile /smallFile5
+COPY smallFile /smallFile6
+COPY smallFile /smallFile7
+COPY smallFile /smallFile8
+COPY smallFile /smallFile9
+COPY smallFile /smallFile10
+COPY smallFile /smallFile11
+COPY smallFile /smallFile12
+COPY smallFile /smallFile13
+COPY smallFile /smallFile14
+COPY smallFile /smallFile15
+COPY smallFile /smallFile16
+COPY smallFile /smallFile17
+COPY smallFile /smallFile18
+COPY smallFile /smallFile19
+COPY smallFile /smallFile20
+COPY out/exampleApp /
+RUN /exampleApp
