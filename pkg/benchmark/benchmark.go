@@ -82,6 +82,12 @@ var BenchMethods = []method{
 		command.RunKind,
 		command.ClearKindCache,
 		"kind",
+	},
+	{
+		command.StartK3d,
+		command.RunK3d,
+		command.ClearK3dCache,
+		"k3d",
 	}}
 
 // Run runs all the benchmarking combinations and returns the average run time and standard deviation for each combination.
