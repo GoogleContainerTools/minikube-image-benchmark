@@ -28,7 +28,7 @@ type method struct {
 }
 
 // Images is the list of all the images to use for benchmarking
-var Images = []string{"alpineFewLargeFiles", "alpineFewSmallFiles", "alpineManyLargeFiles", "alpineManySmallFiles", "buildpacksFewLargeFiles", "buildpacksFewSmallFiles", "buildpacksManyLargeFiles", "buildpacksManySmallFiles", "openjdkFewLargeFiles", "openjdkFewSmallFiles", "openjdkManyLargeFiles", "openjdkManySmallFiles"}
+var Images = []string{"buildpacksFewLargeFiles", "buildpacksFewSmallFiles", "buildpacksManyLargeFiles", "buildpacksManySmallFiles"}
 
 // Iter contains the two flows that are benchmarked
 var Iter = []string{" iterative", " non-iterative"}
