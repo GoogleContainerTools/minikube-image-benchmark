@@ -8,7 +8,20 @@ import (
 
 // StartMinikubeRegistryDocker starts minikube for docker registry.
 func StartMinikubeRegistryDocker(profile string) error {
-	return startMinikube(profile, "docker")
+	if err := startMinikube(profile, "docker"); err != nil {
+		return err
+	}
+
+	if err := setDockerInsecureRegistry(profile); err != nil {
+		return err
+	}
+
+	// setDockerInsecureRegistry restarts docker, so minikube needs to be restarted
+	if err := startMinikube(profile, "docker"); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // StartMinikubeRegistryContainerd starts minikube for containerd registry.
@@ -23,15 +36,6 @@ func StartMinikubeRegistryCrio(profile string) error {
 
 func startMinikubeRegistry(profile string, runtime string) error {
 	runtime = fmt.Sprintf("--container-runtime=%s", runtime)
-	if err := startMinikube(profile, runtime); err != nil {
-		return err
-	}
-
-	if err := setDockerInsecureRegistry(profile); err != nil {
-		return err
-	}
-
-	// setDockerInsecureRegistry restarts docker, so minikube needs to be restarted
 	if err := startMinikube(profile, runtime); err != nil {
 		return err
 	}

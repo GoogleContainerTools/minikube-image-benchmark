@@ -172,7 +172,7 @@ func runNonIterative(runs int, profile string, image string, method method, imag
 // buildExampleApp builds the example app and sets the ldflag using the provided num.
 // This allows the app the easily be changed, helping mimic the iterative workflow.
 func buildExampleApp(num int) error {
-	cArgs := fmt.Sprintf(`go build -o out/exampleApp -ldflags="-X 'main.Num=%d'" testdata/exampleApp/main.go`, num)
+	cArgs := fmt.Sprintf(`GOOS=linux GOARCH=amd64 go build -o out/exampleApp -ldflags="-X 'main.Num=%d'" testdata/exampleApp/main.go`, num)
 	c := exec.Command("/bin/bash", "-c", cArgs)
 	o, err := c.CombinedOutput()
 	if err != nil {
