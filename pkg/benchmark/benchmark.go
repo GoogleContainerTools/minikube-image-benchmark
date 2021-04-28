@@ -36,19 +36,19 @@ var Iter = []string{" iterative", " non-iterative"}
 
 // BenchMethods contains an array of benchmarking funcs
 var BenchMethods = []method{
-	{
+	/*{
 		command.StartMinikubeImageLoadDocker,
 		command.RunImageLoad,
 		command.ClearDockerAndMinikubeDockerCache,
 		"image load docker",
-	},
+	},*/
 	{
 		command.StartMinikubeImageBuildDocker,
 		command.RunImageBuild,
 		command.ClearDockerAndMinikubeDockerCache,
 		"image build docker",
 	},
-	{
+	/*{
 		command.StartMinikubeDockerEnv,
 		command.RunDockerEnv,
 		command.ClearDockerAndMinikubeDockerCache,
@@ -65,14 +65,14 @@ var BenchMethods = []method{
 		command.RunImageLoad,
 		command.ClearDockerCache,
 		"image load containerd",
-	},
+	},*/
 	{
 		command.StartMinikubeImageBuildContainerd,
 		command.RunImageBuild,
 		command.ClearDockerCache,
 		"image build containerd",
 	},
-	{
+	/*{
 		command.StartMinikubeRegistryContainerd,
 		command.RunRegistry,
 		command.ClearDockerCache,
@@ -83,14 +83,14 @@ var BenchMethods = []method{
 		command.RunImageLoad,
 		command.ClearDockerCache,
 		"image load crio",
-	},
+	},*/
 	{
 		command.StartMinikubeImageBuildCrio,
 		command.RunImageBuild,
 		command.ClearDockerCache,
 		"image build crio",
 	},
-	{
+	/*{
 		command.StartMinikubeRegistryCrio,
 		command.RunRegistry,
 		command.ClearDockerCache,
@@ -113,7 +113,7 @@ var BenchMethods = []method{
 		command.RunMicrok8s,
 		command.ClearMicrok8sCache,
 		"microk8s local image",
-	}}
+	}*/}
 
 // Run runs all the benchmarking combinations and returns the average run time and standard deviation for each combination.
 func Run(runs int, profile string) (AggregatedResultsMatrix, error) {

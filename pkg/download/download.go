@@ -18,9 +18,9 @@ func Files() error {
 	if err := downloadFileIfNotExists("https://golang.org/dl/go1.16.linux-amd64.tar.gz", "largeFile"); err != nil {
 		return err
 	}
-	if err := getNewestMinikube(); err != nil {
-		return err
-	}
+	//if err := getNewestMinikube(); err != nil {
+	//	return err
+	//}
 	return nil
 }
 
