@@ -45,7 +45,6 @@ func ClearMicrok8sCache(profile string) error {
 	return DockerSystemPrune()
 }
 
-
 func deleteMicrok8s() error {
 	c := exec.Command("microk8s", "stop")
 	if _, err := run(c); err != nil {

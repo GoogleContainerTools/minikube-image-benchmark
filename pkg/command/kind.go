@@ -38,7 +38,6 @@ func ClearKindCache(profile string) error {
 	return DockerSystemPrune()
 }
 
-
 func deleteKind() error {
 	c := exec.Command("./kind", "delete", "cluster")
 	if _, err := run(c); err != nil {

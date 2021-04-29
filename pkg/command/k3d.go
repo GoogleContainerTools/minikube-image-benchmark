@@ -38,7 +38,6 @@ func ClearK3dCache(profile string) error {
 	return DockerSystemPrune()
 }
 
-
 func deleteK3d() error {
 	c := exec.Command("k3d", "cluster", "delete")
 	if _, err := run(c); err != nil {
