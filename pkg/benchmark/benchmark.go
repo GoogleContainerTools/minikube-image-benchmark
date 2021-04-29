@@ -112,7 +112,7 @@ func Run(runs int, profile string) (AggregatedResultsMatrix, error) {
 
 	for _, method := range BenchMethods {
 		if err := method.startMinikube(profile); err != nil {
-			log.Println("failed to start %s: %v", method.Name, err)
+			log.Printf("failed to start %s: %v", method.Name, err)
 			continue
 		}
 
@@ -123,14 +123,14 @@ func Run(runs int, profile string) (AggregatedResultsMatrix, error) {
 					imageResults = map[string][]float64{}
 				}
 				if err := mode(runs, profile, image, method, imageResults); err != nil {
-					log.Println("failed to run benchmark %s: %v", method.Name, err)
+					log.Printf("failed to run benchmark %s: %v", method.Name, err)
 				}
 				results[image] = imageResults
 			}
 		}
 
 		if err := command.Delete(); err != nil {
-			log.Println("failed to delete %s: %v", method.Name, err)
+			log.Printf("failed to delete %s: %v", method.Name, err)
 		}
 	}
 
