@@ -5,3 +5,5 @@ smallFile
 
 minikube
 kind
+
+*.tar
