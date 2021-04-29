@@ -9,7 +9,7 @@ import (
 func StartKind(profile string) error {
 	c := exec.Command("./kind", "create", "cluster")
 	if _, err := run(c); err != nil {
-		return fmt.Errorf("failed to start kind:: %v", err)
+		return fmt.Errorf("failed to start kind: %v", err)
 	}
 
 	return nil
