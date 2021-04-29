@@ -7,7 +7,7 @@ import (
 )
 
 func StartMicrok8s(profile string) error {
-	c := exec.Command("microk8s", "start", "create", "benchmark")
+	c := exec.Command("microk8s", "start")
 	if _, err := run(c); err != nil {
 		return fmt.Errorf("failed to start microk8s: %v", err)
 	}
