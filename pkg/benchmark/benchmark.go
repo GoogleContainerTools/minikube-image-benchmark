@@ -88,6 +88,12 @@ var BenchMethods = []method{
 		command.RunK3d,
 		command.ClearK3dCache,
 		"k3d",
+	},
+	{
+		command.StartMicrok8s,
+		command.RunMicrok8s,
+		command.ClearMicrok8sCache,
+		"microk8s local image",
 	}}
 
 // Run runs all the benchmarking combinations and returns the average run time and standard deviation for each combination.
