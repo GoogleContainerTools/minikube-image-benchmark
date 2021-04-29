@@ -4,6 +4,7 @@ package benchmark
 
 import (
 	"fmt"
+	"log"
 	"math"
 	"os/exec"
 
