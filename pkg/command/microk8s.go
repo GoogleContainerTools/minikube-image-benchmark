@@ -31,7 +31,7 @@ func RunMicrok8s(image string, profile string) (float64, error) {
 		return 0, fmt.Errorf("failed to save image via microk8s: %v", err)
 	}
 
-	// kind load
+	// microk8s load
 	imageLoad := exec.Command("microk8s", "ctr", "image", "import", "benchmark-microk8s.tar")
 	if _, err := run(imageLoad); err != nil {
 		return 0, fmt.Errorf("failed to microk8s load: %v", err)
