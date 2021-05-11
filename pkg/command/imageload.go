@@ -38,15 +38,9 @@ func RunImageLoad(image string, profile string) (float64, error) {
 	}
 	elapsed := time.Now().Sub(start)
 
-	// verify image exists
-	verifyImageArgs := fmt.Sprintf("eval $(./minikube -p %s docker-env) && docker image ls | grep benchmark-image", profile)
-	verifyImage := exec.Command("/bin/bash", "-c", verifyImageArgs)
-	o, err := run(verifyImage)
-	if err != nil {
-		return 0, fmt.Errorf("failed to get image list: %v", err)
-	}
-	if string(o) == "" {
-		return 0, fmt.Errorf("image was not found after image load")
+	// verify
+	if err := verifyImage("benchmark-image", profile); err != nil {
+		return 0, fmt.Errorf("image was not found after image load: %v", err)
 	}
 
 	return elapsed.Seconds(), nil

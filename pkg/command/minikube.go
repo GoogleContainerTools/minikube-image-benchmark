@@ -47,3 +47,17 @@ func minikubeIP(profile string) (string, error) {
 
 	return ip, nil
 }
+
+func verifyImage(image string, profile string) error {
+	verifyArgs := fmt.Sprintf("./minikube -p %s image ls | grep %s", profile, image)
+	verify := exec.Command("/bin/bash", "-c", verifyArgs)
+	o, err := run(verify)
+	if err != nil {
+		return fmt.Errorf("failed to get image list: %v", err)
+	}
+	if string(o) == "" {
+		return fmt.Errorf("image was not found")
+	}
+
+	return nil
+}
