@@ -22,6 +22,11 @@ func RunDockerEnv(image string, profile string) (float64, error) {
 	}
 	elapsed := time.Now().Sub(start)
 
+	// verify
+	if err := verifyImage("benchmark-env", profile); err != nil {
+		return 0, fmt.Errorf("image was not found after docker-env: %v", err)
+	}
+
 	return elapsed.Seconds(), nil
 }
 
