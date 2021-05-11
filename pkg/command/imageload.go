@@ -48,8 +48,8 @@ func RunImageLoad(image string, profile string) (float64, error) {
 
 // ClearImageLoadCache clears out caching related to the image load method.
 func ClearImageLoadCache(profile string) error {
-	if err := minikubeDockerSystemPrune(profile); err != nil {
+	if err := DockerSystemPrune(); err != nil {
 		return err
 	}
-	return DockerSystemPrune()
+	return minikubeDockerSystemPrune(profile)
 }
