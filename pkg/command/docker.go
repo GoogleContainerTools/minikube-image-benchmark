@@ -16,7 +16,7 @@ func DockerSystemPrune() error {
 
 // minikubeDockerSystemPrune doese a minikube docker system prune
 func minikubeDockerSystemPrune(profile string) error {
-	args := fmt.Sprintf("eval $(./minikube -p %s docker-env) && docker system prune -a --volumes -f", profile)
+	args := fmt.Sprintf("./minikube -p %s ssh -- docker system prune -a --volumes -f", profile)
 	c := exec.Command("/bin/bash", "-c", args)
 	if _, err := run(c); err != nil {
 		return fmt.Errorf("failed to minikube docker prune: %v", err)
