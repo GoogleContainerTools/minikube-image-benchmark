@@ -61,3 +61,11 @@ func verifyImage(image string, profile string) error {
 
 	return nil
 }
+
+// ClearDockerAndMinikubeDockerCache clears out caching related to the docker-env method.
+func ClearDockerAndMinikubeDockerCache(profile string) error {
+	if err := DockerSystemPrune(); err != nil {
+		return err
+	}
+	return minikubeDockerSystemPrune(profile)
+}

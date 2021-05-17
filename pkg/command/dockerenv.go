@@ -29,11 +29,3 @@ func RunDockerEnv(image string, profile string) (float64, error) {
 
 	return elapsed.Seconds(), nil
 }
-
-// ClearDockerEnvCache clears out caching related to the docker-env method.
-func ClearDockerEnvCache(profile string) error {
-	if err := DockerSystemPrune(); err != nil {
-		return err
-	}
-	return minikubeDockerSystemPrune(profile)
-}

@@ -23,3 +23,8 @@ func minikubeDockerSystemPrune(profile string) error {
 	}
 	return nil
 }
+
+// ClearDockerCache clears out Dockers caching.
+func ClearDockerCache(profile string) error {
+	return DockerSystemPrune()
+}
