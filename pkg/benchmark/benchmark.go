@@ -43,6 +43,12 @@ var BenchMethods = []method{
 		"image load docker",
 	},
 	{
+		command.StartMinikubeImageBuildDocker,
+		command.RunImageBuild,
+		command.ClearDockerAndMinikubeDockerCache,
+		"image build docker",
+	},
+	{
 		command.StartMinikubeDockerEnv,
 		command.RunDockerEnv,
 		command.ClearDockerAndMinikubeDockerCache,
@@ -61,6 +67,12 @@ var BenchMethods = []method{
 		"image load containerd",
 	},
 	{
+		command.StartMinikubeImageBuildContainerd,
+		command.RunImageBuild,
+		command.ClearDockerCache,
+		"image build containerd",
+	},
+	{
 		command.StartMinikubeRegistryContainerd,
 		command.RunRegistry,
 		command.ClearDockerCache,
@@ -71,6 +83,12 @@ var BenchMethods = []method{
 		command.RunImageLoad,
 		command.ClearDockerCache,
 		"image load crio",
+	},
+	{
+		command.StartMinikubeImageBuildCrio,
+		command.RunImageBuild,
+		command.ClearDockerCache,
+		"image build crio",
 	},
 	{
 		command.StartMinikubeRegistryCrio,
