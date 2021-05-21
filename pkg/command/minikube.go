@@ -6,7 +6,7 @@ import (
 )
 
 func startMinikube(profile string, args ...string) error {
-	a := []string{"start", "-p", profile}
+	a := []string{"start", "-p", profile, "--driver", "hyperkit"}
 	a = append(a, args...)
 	c := exec.Command("./minikube", a...)
 	if _, err := run(c); err != nil {
