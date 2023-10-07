@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func StartKind(profile string) error {
+func StartKind(profile string, args ...string) error {
 	c := exec.Command("./kind", "create", "cluster")
 	if _, err := run(c); err != nil {
 		return fmt.Errorf("failed to start kind: %v", err)

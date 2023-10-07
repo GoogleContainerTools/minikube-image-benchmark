@@ -15,6 +15,14 @@ import (
 func main() {
 	runs := flag.Int("runs", 100, "number of runs per benchmark")
 	profile := flag.String("profile", "benchmark", "profile to use for minikube commands")
+	// images is a list of images we use, seperated by ,
+	images := flag.String("images", "", "a comma separated list of images to benchmark")
+
+	benchFlows := flag.String("iters", "iterative,non-iterative", "a comma separated list of flows to benchmark, options [iterative,non-iterative]")
+
+	benchMethods := flag.String("bench-methods", "", "a comma separated list of benchmark method names")
+	memory := flag.String("memory", "", "Amount of RAM to allocate to Kubernetes (format: <number>[<unit>], where unit = b, k, m or g). Use \"max\" to use the maximum amount of memory")
+
 	flag.Parse()
 
 	if *runs <= 0 {
@@ -27,7 +35,11 @@ func main() {
 
 	defer command.Delete()
 
-	results, err := benchmark.Run(*runs, *profile)
+	extraMinikubeStartArgs := []string{}
+	if *memory != "" {
+		extraMinikubeStartArgs = append(extraMinikubeStartArgs, "--memory="+*memory)
+	}
+	results, err := benchmark.Run(*runs, benchmark.NewBenchMarkRunConfig(*profile, *images, *benchFlows, *benchMethods, extraMinikubeStartArgs))
 	if err != nil {
 		log.Printf("failed running benchmarks: %v", err)
 		return
