@@ -35,6 +35,6 @@ cat ./out/results.csv # where the output is stored
 ```
 
 ## Non-Iterative vs Iterative Flow
-In the iterative flow the images/cache is cleared after every image build, making it so each build is on a brand new Docker.
+In the non-iterative flow the images/cache is cleared after every image build, making it so each build is on a brand new Docker.
 
-In the non-iterative flow the images/cache is cleared at the end of a set of benchmarks. So if 20 runs per benchmark, no cache is cleared until all 20 runs have completed, just the last layer of the image is changed between runs.
+In the iterative flow the images/cache is cleared at the end of a set of benchmarks. So if 20 runs per benchmark, no cache is cleared until all 20 runs have completed, just the last layer of the image is changed between runs.
