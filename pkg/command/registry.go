@@ -8,7 +8,7 @@ import (
 
 // StartMinikubeRegistryDocker starts minikube for docker registry.
 func StartMinikubeRegistryDocker(profile string) error {
-	return startMinikube(profile, "docker")
+	return startMinikubeRegistry(profile, "docker")
 }
 
 // StartMinikubeRegistryContainerd starts minikube for containerd registry.
