@@ -15,7 +15,6 @@ import (
 func main() {
 	runs := flag.Int("runs", 100, "number of runs per benchmark")
 	profile := flag.String("profile", "benchmark", "profile to use for minikube commands")
-	// images is a list of images we use, seperated by ,
 	images := flag.String("images", "", "a comma separated list of images to benchmark")
 
 	benchFlows := flag.String("iters", "iterative,non-iterative", "a comma separated list of flows to benchmark, options [iterative,non-iterative]")
