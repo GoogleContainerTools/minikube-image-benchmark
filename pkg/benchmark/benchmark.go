@@ -30,7 +30,7 @@ type BenchmarkRunConfig struct {
 	Profile           string
 }
 
-func NewBenchMarkRunConfig(profile, imageList, iterList, benchMethodList string, minikubeStartArgs []string) *BenchMarkRunConfig {
+func NewBenchmarkRunConfig(profile, imageList, iterList, benchMethodList string, minikubeStartArgs []string) *BenchmarkRunConfig {
 	res := BenchMarkRunConfig{
 		BenchMethods:      make(map[string]struct{}),
 		Iters:             make(map[string]struct{}),
