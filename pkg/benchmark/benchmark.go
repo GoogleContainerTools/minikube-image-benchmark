@@ -170,7 +170,7 @@ var BenchMethods = []method{
 	}}
 
 // Run runs all the benchmarking combinations and returns the average run time and standard deviation for each combination.
-func Run(runs int, config *BenchMarkRunConfig) (AggregatedResultsMatrix, error) {
+func Run(runs int, config *BenchmarkRunConfig) (AggregatedResultsMatrix, error) {
 	modes := []func(runs int, profile string, image string, method method, imageResults map[string][]float64) error{
 		runIterative,
 		runNonIterative,
