@@ -22,7 +22,7 @@ type aggregatedRunResult struct {
 // AggregatedResultsMatrix is a map containing the run results for every image method combination.
 type AggregatedResultsMatrix map[string]map[string]aggregatedRunResult
 
-type BenchMarkRunConfig struct {
+type BenchmarkRunConfig struct {
 	BenchMethods      map[string]struct{}
 	Iters             map[string]struct{}
 	Images            map[string]struct{}
