@@ -36,7 +36,7 @@ func main() {
 	if *memory != "" {
 		extraMinikubeStartArgs = append(extraMinikubeStartArgs, "--memory="+*memory)
 	}
-	results, err := benchmark.Run(*runs, benchmark.NewBenchMarkRunConfig(*profile, *images, *benchFlows, *benchMethods, extraMinikubeStartArgs))
+	results, err := benchmark.Run(*runs, benchmark.NewBenchmarkRunConfig(*profile, *images, *benchFlows, *benchMethods, extraMinikubeStartArgs))
 	if err != nil {
 		log.Printf("failed running benchmarks: %v", err)
 		return
