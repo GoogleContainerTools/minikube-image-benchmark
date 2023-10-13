@@ -38,10 +38,8 @@ func NewBenchmarkRunConfig(profile, imageList, iterList, benchMethodList string,
 		MinikubeStartArgs: minikubeStartArgs,
 		Profile:           profile,
 	}
-	var split []string
-	if imageList == "" {
-		split = Images
-	} else {
+	split := Images
+	if imageList != "" {
 		split = strings.Split(imageList, ",")
 	}
 	for _, image := range split {
