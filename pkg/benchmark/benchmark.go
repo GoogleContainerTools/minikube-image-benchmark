@@ -31,7 +31,7 @@ type BenchmarkRunConfig struct {
 }
 
 func NewBenchmarkRunConfig(profile, imageList, iterList, benchMethodList string, minikubeStartArgs []string) *BenchmarkRunConfig {
-	res := BenchMarkRunConfig{
+	res := BenchmarkRunConfig{
 		BenchMethods:      make(map[string]struct{}),
 		Iters:             make(map[string]struct{}),
 		Images:            make(map[string]struct{}),
