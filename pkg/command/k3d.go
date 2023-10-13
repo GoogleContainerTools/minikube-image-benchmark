@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func StartK3d(profile string) error {
+func StartK3d(profile string, args ...string) error {
 	c := exec.Command("k3d", "cluster", "create", "benchmark")
 	if _, err := run(c); err != nil {
 		return fmt.Errorf("failed to start k3d: %v", err)

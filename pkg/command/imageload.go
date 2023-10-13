@@ -7,18 +7,19 @@ import (
 )
 
 // StartMinikubeImageLoadDocker starts minikube for docker image load.
-func StartMinikubeImageLoadDocker(profile string) error {
-	return startMinikube(profile)
+func StartMinikubeImageLoadDocker(profile string, args ...string) error {
+	return startMinikube(profile, args...)
 }
 
 // StartMinikubeImageLoadContainerd starts minikube for containerd image load.
-func StartMinikubeImageLoadContainerd(profile string) error {
+func StartMinikubeImageLoadContainerd(profile string, args ...string) error {
 	return startMinikube(profile, "--container-runtime=containerd")
 }
 
 // StartMinikubeImageLoadCrio start minikube for crio image load.
-func StartMinikubeImageLoadCrio(profile string) error {
-	return startMinikube(profile, "--container-runtime=cri-o")
+func StartMinikubeImageLoadCrio(profile string, args ...string) error {
+	arguments := append([]string{"--container-runtime=cri-o"}, args...)
+	return startMinikube(profile, arguments...)
 }
 
 // RunImageLoad builds the provided image using the image load method and returns the run time.

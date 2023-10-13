@@ -7,6 +7,7 @@ import (
 	"log"
 	"math"
 	"os/exec"
+	"strings"
 
 	"benchmark/pkg/command"
 )
@@ -21,8 +22,58 @@ type aggregatedRunResult struct {
 // AggregatedResultsMatrix is a map containing the run results for every image method combination.
 type AggregatedResultsMatrix map[string]map[string]aggregatedRunResult
 
+type BenchmarkRunConfig struct {
+	BenchMethods      map[string]struct{}
+	Iters             map[string]struct{}
+	Images            map[string]struct{}
+	MinikubeStartArgs []string
+	Profile           string
+}
+
+func NewBenchmarkRunConfig(profile, imageList, iterList, benchMethodList string, minikubeStartArgs []string) *BenchmarkRunConfig {
+	res := BenchmarkRunConfig{
+		BenchMethods:      make(map[string]struct{}),
+		Iters:             make(map[string]struct{}),
+		Images:            make(map[string]struct{}),
+		MinikubeStartArgs: minikubeStartArgs,
+		Profile:           profile,
+	}
+	split := Images
+	if imageList != "" {
+		split = strings.Split(imageList, ",")
+	}
+	for _, image := range split {
+		res.Images[image] = struct{}{}
+	}
+
+	split = Iter
+	if iterList != "" {
+		split = strings.Split(iterList, ",")
+		for i, s := range split {
+			split[i] = " " + s
+		}
+	}
+	for _, iter := range split {
+		res.Iters[iter] = struct{}{}
+	}
+
+	if benchMethodList == "" {
+		for _, method := range BenchMethods {
+			res.BenchMethods[method.Name] = struct{}{}
+		}
+	} else {
+		split = strings.Split(benchMethodList, ",")
+		for _, method := range split {
+			res.BenchMethods[method] = struct{}{}
+		}
+	}
+
+	return &res
+
+}
+
 type method struct {
-	startMinikube func(profile string) error
+	startMinikube func(profile string, args ...string) error
 	bench         func(image string, profile string) (float64, error)
 	cacheClear    func(profile string) error
 	Name          string
@@ -116,7 +167,7 @@ var BenchMethods = []method{
 	}}
 
 // Run runs all the benchmarking combinations and returns the average run time and standard deviation for each combination.
-func Run(runs int, profile string) (AggregatedResultsMatrix, error) {
+func Run(runs int, config *BenchmarkRunConfig) (AggregatedResultsMatrix, error) {
 	modes := []func(runs int, profile string, image string, method method, imageResults map[string][]float64) error{
 		runIterative,
 		runNonIterative,
@@ -129,26 +180,50 @@ func Run(runs int, profile string) (AggregatedResultsMatrix, error) {
 	}
 
 	for _, method := range BenchMethods {
-		if err := method.startMinikube(profile); err != nil {
-			log.Printf("failed to start %s: %v", method.Name, err)
-			continue
+		skipMethod := false
+		if _, ok := config.BenchMethods[method.Name]; !ok {
+			skipMethod = true
 		}
 
-		for _, mode := range modes {
+		if !skipMethod {
+			// no need to start or delete if this method is completely skipped
+			if err := method.startMinikube(config.Profile, config.MinikubeStartArgs...); err != nil {
+				log.Printf("failed to start %s: %v", method.Name, err)
+				continue
+			}
+		}
+
+		for index, itr := range Iter {
 			for _, image := range Images {
 				imageResults := results[image]
 				if imageResults == nil {
 					imageResults = map[string][]float64{}
 				}
-				if err := mode(runs, profile, image, method, imageResults); err != nil {
-					log.Printf("failed to run benchmark %s: %v", method.Name, err)
+				// check we are going to skip this run
+				skipRun := skipMethod
+				if _, ok := config.Images[image]; !ok {
+					skipRun = true
+				}
+				if _, ok := config.Iters[itr]; !ok {
+					skipRun = true
+				}
+				if skipRun {
+					// skip this run
+					fmt.Printf("Benchmark %s on %s (%s) is skipped\n", image, method.Name, itr)
+				} else {
+					// run this method
+					if err := modes[index](runs, config.Profile, image, method, imageResults); err != nil {
+						log.Printf("failed to run benchmark %s: %v", method.Name, err)
+					}
 				}
 				results[image] = imageResults
 			}
 		}
 
-		if err := command.Delete(); err != nil {
-			log.Printf("failed to delete %s: %v", method.Name, err)
+		if !skipMethod {
+			if err := command.Delete(); err != nil {
+				log.Printf("failed to delete %s: %v", method.Name, err)
+			}
 		}
 	}
 

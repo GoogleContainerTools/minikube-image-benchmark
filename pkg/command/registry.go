@@ -7,23 +7,24 @@ import (
 )
 
 // StartMinikubeRegistryDocker starts minikube for docker registry.
-func StartMinikubeRegistryDocker(profile string) error {
-	return startMinikubeRegistry(profile, "docker")
+func StartMinikubeRegistryDocker(profile string, args ...string) error {
+	return startMinikubeRegistry(profile, "docker", args...)
 }
 
 // StartMinikubeRegistryContainerd starts minikube for containerd registry.
-func StartMinikubeRegistryContainerd(profile string) error {
-	return startMinikubeRegistry(profile, "containerd")
+func StartMinikubeRegistryContainerd(profile string, args ...string) error {
+	return startMinikubeRegistry(profile, "containerd", args...)
 }
 
 // StartMinikubeRegistryCrio start minikube for crio registry.
-func StartMinikubeRegistryCrio(profile string) error {
-	return startMinikubeRegistry(profile, "cri-o")
+func StartMinikubeRegistryCrio(profile string, args ...string) error {
+	return startMinikubeRegistry(profile, "cri-o", args...)
 }
 
-func startMinikubeRegistry(profile string, runtime string) error {
+func startMinikubeRegistry(profile string, runtime string, otherStartArgs ...string) error {
 	runtime = fmt.Sprintf("--container-runtime=%s", runtime)
-	if err := startMinikube(profile, runtime); err != nil {
+	arguments := append([]string{runtime}, otherStartArgs...)
+	if err := startMinikube(profile, arguments...); err != nil {
 		return err
 	}
 
@@ -32,7 +33,7 @@ func startMinikubeRegistry(profile string, runtime string) error {
 	}
 
 	// setDockerInsecureRegistry restarts docker, so minikube needs to be restarted
-	if err := startMinikube(profile, runtime); err != nil {
+	if err := startMinikube(profile, arguments...); err != nil {
 		return err
 	}
 
