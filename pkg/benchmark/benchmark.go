@@ -46,9 +46,8 @@ func NewBenchmarkRunConfig(profile, imageList, iterList, benchMethodList string,
 		res.Images[image] = struct{}{}
 	}
 
-	if iterList == "" {
-		split = Iter
-	} else {
+	split = Iter
+	if iterList != "" {
 		split = strings.Split(iterList, ",")
 		for i, s := range split {
 			split[i] = " " + s
