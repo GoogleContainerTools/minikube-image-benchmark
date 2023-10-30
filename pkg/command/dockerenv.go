@@ -3,6 +3,7 @@ package command
 import (
 	"fmt"
 	"os/exec"
+	"strings"
 	"time"
 )
 
@@ -11,10 +12,20 @@ func StartMinikubeDockerEnv(profile string, args ...string) error {
 	return startMinikube(profile, args...)
 }
 
+func StartMinikubeDockerEnvContainerd(profile string, args ...string) error {
+	return startMinikube(profile, "--container-runtime=containerd")
+}
+
 // RunDockerEnv builds the provided image using the docker-env method and returns the run time.
 func RunDockerEnv(image string, profile string) (float64, error) {
+	return runDockerEnv(image, profile)
+}
+func RunDockerEnvWithBuildKitDiabled(image string, profile string) (float64, error) {
+	return runDockerEnv(image, profile, "DOCKER_BUILDKIT=0")
+}
+func runDockerEnv(image string, profile string, envs ...string) (float64, error) {
 	// build
-	buildArgs := fmt.Sprintf("eval $(./minikube -p %s docker-env) && docker build -t benchmark-env -f testdata/Dockerfile.%s .", profile, image)
+	buildArgs := fmt.Sprintf("eval $(./minikube -p %s docker-env) && %s docker build -t benchmark-env -f testdata/Dockerfile.%s .", profile, strings.Join(envs, " "), image)
 	build := exec.Command("/bin/bash", "-c", buildArgs)
 	start := time.Now()
 	if _, err := run(build); err != nil {
