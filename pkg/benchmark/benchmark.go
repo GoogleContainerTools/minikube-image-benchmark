@@ -124,6 +124,12 @@ var BenchMethods = []method{
 		"image build containerd",
 	},
 	{
+		command.StartMinikubeDockerEnvContainerd,
+		command.RunDockerEnvWithBuildKitDiabled,
+		func(s string) error { return nil },
+		"docker-env containerd",
+	},
+	{
 		command.StartMinikubeRegistryContainerd,
 		command.RunRegistry,
 		command.ClearDockerCache,
